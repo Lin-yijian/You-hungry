@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>饿了吧外卖 - 设计预览</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Microsoft YaHei', 'PingFang SC', 'Segoe UI', sans-serif; background: #111; color: #e8e8e8; padding: 40px; }
+  h1 { color: #FFC72C; text-align: center; font-size: 32px; font-weight: 800; letter-spacing: 4px; margin-bottom: 4px; }
+  .subtitle { text-align: center; color: rgba(255,255,255,.4); font-size: 14px; letter-spacing: 8px; margin-bottom: 40px; }
+  .section { background: #1a1a1a; border: 1px solid rgba(255,255,255,.06); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .section h2 { color: #FFC72C; font-size: 16px; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.08); letter-spacing: 2px; }
+  .preview-grid { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; justify-content: center; }
+  .preview-item { text-align: center; }
+  .preview-item img { border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: #141414; }
+  .preview-item .label { font-size: 12px; color: #666; margin-top: 8px; font-family: monospace; }
+  .preview-item .size { font-size: 10px; color: #444; }
+
+  /* Login page mockup */
+  .login-mockup { display: flex; border-radius: 16px; overflow: hidden; max-width: 900px; margin: 0 auto; background: #1e1e1e; box-shadow: 0 25px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05); }
+  .login-mockup-left { width: 55%; min-height: 420px; background: linear-gradient(135deg, #1A1A1A 0%, #2D0000 50%, #DA291C 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .login-mockup-left img { width: 100%; height: 100%; object-fit: cover; }
+  .login-mockup-right { width: 45%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 36px; background: linear-gradient(180deg, #1e1e1e 0%, #1a1a1a 100%); }
+  .login-mockup-right .logo-area { margin-bottom: 44px; text-align: center; }
+  .login-mockup-right .logo-area img { height: 42px; filter: drop-shadow(0 2px 8px rgba(255,199,44,.3)); }
+  .login-mockup-right .field { width: 100%; margin-bottom: 24px; }
+  .login-mockup-right .field input { width: 100%; background: transparent; border: 0; border-bottom: 2px solid rgba(255,255,255,.12); padding: 10px 4px; font-size: 14px; color: #e8e8e8; outline: none; transition: border-color .3s; }
+  .login-mockup-right .field input:focus { border-bottom-color: #FFC72C; }
+  .login-mockup-right .field input::placeholder { color: rgba(255,255,255,.25); }
+  .login-mockup-right .login-btn { width: 100%; height: 44px; border-radius: 22px; font-size: 15px; font-weight: 600; letter-spacing: 3px; color: #1a1a1a; background: linear-gradient(135deg, #FFE082, #FFC72C, #FF8F00); border: 0; box-shadow: 0 4px 20px rgba(255,199,44,.35); cursor: pointer; margin-top: 8px; transition: all .3s; }
+  .login-mockup-right .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,199,44,.5); }
+
+  .icon-grid { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .icon-item { text-align: center; width: 90px; }
+  .icon-item img { border: 1px solid rgba(255,255,255,.06); border-radius: 8px; background: #141414; }
+  .icon-item .label { font-size: 10px; color: #555; margin-top: 4px; word-break: break-all; font-family: monospace; }
+
+  .note { background: rgba(255,199,44,.08); border: 1px solid rgba(255,199,44,.15); border-radius: 10px; padding: 16px 20px; margin-top: 28px; font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.8; }
+  .note strong { color: #FFC72C; }
+
+  @media (max-width: 768px) {
+    .login-mockup { flex-direction: column; }
+    .login-mockup-left { width: 100%; min-height: 200px; }
+    .login-mockup-right { width: 100%; padding: 30px 24px; }
+    body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>饿了吧外卖</h1>
+<p class="subtitle">PREMIUM DELIVERY</p>
+
+<!-- Login Page Mockup -->
+<div class="section">
+  <h2>登录页效果模拟</h2>
+  <div class="login-mockup">
+    <div class="login-mockup-left">
+      <img src="sky/img/login-l.6ef9d260.png" alt="插画">
+    </div>
+    <div class="login-mockup-right">
+      <div class="logo-area">
+        <img src="sky/img/icon_logo.38b01728.png" alt="饿了吧外卖">
+      </div>
+      <div class="field">
+        <input type="text" placeholder="账号">
+      </div>
+      <div class="field">
+        <input type="password" placeholder="密码">
+      </div>
+      <button class="login-btn">登 录</button>
+    </div>
+  </div>
+</div>
+
+<!-- Logo Images -->
+<div class="section">
+  <h2>Logo 资源</h2>
+  <div class="preview-grid">
+    <div class="preview-item">
+      <div style="background:#1a1a1a;border-radius:10px;padding:18px 24px;display:inline-block;">
+        <img src="sky/img/icon_logo.38b01728.png" style="height:38px;background:transparent;" alt="Text Logo">
+      </div>
+      <div class="label">icon_logo (登录页标题)</div>
+      <div class="size">596×152</div>
+    </div>
+    <div class="preview-item">
+      <div style="background:linear-gradient(180deg,rgba(218,41,28,.15),transparent);border-radius:10px;padding:18px 20px;display:inline-block;">
+        <img src="sky/img/logo.38b01728.png" style="height:36px;" alt="Sidebar Logo">
+      </div>
+      <div class="label">logo (侧边栏展开)</div>
+      <div class="size">400×120</div>
+    </div>
+    <div class="preview-item">
+      <div style="background:#1a1a1a;border-radius:10px;padding:14px;display:inline-block;">
+        <img src="sky/img/mini-logo.bf141cfc.png" style="width:40px;height:40px;" alt="Mini Logo">
+      </div>
+      <div class="label">mini-logo (侧边栏收起)</div>
+      <div class="size">200×200</div>
+    </div>
+  </div>
+</div>
+
+<!-- PWA Icons -->
+<div class="section">
+  <h2>PWA 图标</h2>
+  <div class="icon-grid">
+    <div class="icon-item"><img src="sky/img/icons/favicon-16x16.png" width="16"><div class="label">favicon-16</div></div>
+    <div class="icon-item"><img src="sky/img/icons/favicon-32x32.png" width="32"><div class="label">favicon-32</div></div>
+    <div class="icon-item"><img src="sky/img/icons/apple-touch-icon-60x60.png" width="60"><div class="label">apple-60</div></div>
+    <div class="icon-item"><img src="sky/img/icons/apple-touch-icon-76x76.png" width="76"><div class="label">apple-76</div></div>
+    <div class="icon-item"><img src="sky/img/icons/apple-touch-icon-120x120.png" width="80"><div class="label">apple-120</div></div>
+    <div class="icon-item"><img src="sky/img/icons/apple-touch-icon-152x152.png" width="80"><div class="label">apple-152</div></div>
+    <div class="icon-item"><img src="sky/img/icons/apple-touch-icon-180x180.png" width="80"><div class="label">apple-180</div></div>
+    <div class="icon-item"><img src="sky/img/icons/android-chrome-192x192.png" width="80"><div class="label">android-192</div></div>
+    <div class="icon-item"><img src="sky/img/icons/android-chrome-512x512.png" width="100"><div class="label">android-512</div></div>
+    <div class="icon-item"><img src="sky/img/icons/msapplication-icon-144x144.png" width="72"><div class="label">ms-144</div></div>
+    <div class="icon-item"><img src="sky/img/icons/mstile-150x150.png" width="75"><div class="label">mstile-150</div></div>
+    <div class="icon-item"><img src="sky/img/icons/safari-pinned-tab.svg" width="48"><div class="label">safari-svg</div></div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>部署注意：</strong>重新部署到 nginx 后，先在浏览器中打开 DevTools (F12) → Application → Service Workers → 点击 <strong>Unregister</strong> 注销旧 SW，然后用 <strong>Ctrl+Shift+R</strong> 硬刷新。或用无痕窗口访问即可看到新界面。<br>
+  前端已改为暗黑高端风格：黑底红金配色、金色渐变按钮、磨砂侧边栏、现代毛玻璃效果。
+</div>
+
+</body>
+</html>
