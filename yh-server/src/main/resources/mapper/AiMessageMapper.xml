@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yh.mapper.AiMessageMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into ai_message (conversation_id, role, content, tool_name, create_time)
+        values (#{conversationId}, #{role}, #{content}, #{toolName}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" parameterType="list">
+        insert into ai_message (conversation_id, role, content, tool_name, create_time)
+        values
+        <foreach collection="list" item="msg" separator=",">
+            (#{msg.conversationId}, #{msg.role}, #{msg.content}, #{msg.toolName}, #{msg.createTime})
+        </foreach>
+    </insert>
+
+    <select id="getByConversationId" resultType="com.yh.entity.AiMessage">
+        select * from ai_message where conversation_id = #{conversationId}
+        order by create_time asc
+    </select>
+
+    <select id="getRecentByConversationId" resultType="com.yh.entity.AiMessage">
+        select * from ai_message
+        where conversation_id = #{param1}
+        order by create_time desc
+        limit #{param2}
+    </select>
+
+    <delete id="deleteByConversationId">
+        delete from ai_message where conversation_id = #{conversationId}
+    </delete>
+
+</mapper>

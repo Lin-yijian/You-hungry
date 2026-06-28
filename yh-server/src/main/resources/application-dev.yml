@@ -25,3 +25,12 @@ sky:
     weChatPayCertFilePath: ${SKY_WECHAT_CERT_PATH:}
     notifyUrl: https://37d20616.r8.cpolar.top/notify/paySuccess
     refundNotifyUrl: https://37d20616.r8.cpolar.top/notify/refundSuccess
+  ai:
+    provider: deepseek
+    api-key: 1
+    model: deepseek-chat
+    endpoint: https://api.deepseek.com/v1/chat/completions
+    max-tokens: 4096
+    temperature: 0.3
+    timeout-seconds: 120
+    max-history-messages: 40

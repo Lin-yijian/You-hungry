@@ -59,3 +59,12 @@ sky:
     weChatPayCertFilePath: ${sky.wechat.weChatPayCertFilePath}
     notifyUrl: ${sky.wechat.notifyUrl}
     refoundNotifyUrl: ${sky.wechat.refoundNotifyUrl}
+  ai:
+    provider: ${sky.ai.provider}
+    api-key: ${sky.ai.api-key}
+    model: ${sky.ai.model}
+    endpoint: ${sky.ai.endpoint}
+    max-tokens: ${sky.ai.max-tokens}
+    temperature: ${sky.ai.temperature}
+    timeout-seconds: ${sky.ai.timeout-seconds}
+    max-history-messages: ${sky.ai.max-history-messages}
