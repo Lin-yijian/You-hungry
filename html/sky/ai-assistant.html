@@ -321,7 +321,7 @@ new Vue({
   methods: {
     async login() {
       try {
-        var resp = await fetch('http://localhost:8080/admin/employee/login', {
+        var resp = await fetch('/api/employee/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: 'admin', password: '123456' })
@@ -341,7 +341,7 @@ new Vue({
     },
     async loadConversations() {
       try {
-        var resp = await fetch('http://localhost:8080/admin/ai/conversations?page=1&pageSize=50', {
+        var resp = await fetch('/api/ai/conversations?page=1&pageSize=50', {
           headers: { 'token': this.token }
         });
         var data = await resp.json();
@@ -359,7 +359,7 @@ new Vue({
     },
     async loadMessages(convId) {
       try {
-        var resp = await fetch('http://localhost:8080/admin/ai/conversations/' + convId, {
+        var resp = await fetch('/api/ai/conversations/' + convId, {
           headers: { 'token': this.token }
         });
         var data = await resp.json();
@@ -381,7 +381,7 @@ new Vue({
     async deleteConversation(convId) {
       if (!confirm('删除这条对话？')) return;
       try {
-        await fetch('http://localhost:8080/admin/ai/conversations/' + convId, {
+        await fetch('/api/ai/conversations/' + convId, {
           method: 'DELETE', headers: { 'token': this.token }
         });
         this.conversations = this.conversations.filter(function(c) { return c.id !== convId; });
@@ -393,86 +393,91 @@ new Vue({
       var msg = text.trim(); this.inputMsg = ''; this.isStreaming = true;
 
       this.messages.push({ role: 'user', content: msg });
-      this.scrollBottom();
+      var self = this;
       var aiIdx = this.messages.length;
       this.messages.push({ role: 'assistant', content: '', isStreaming: true });
-      var aiMsg = this.messages[aiIdx];
+
+      this.$nextTick(function() { self.scrollBottom(); });
 
       try {
-        var resp = await fetch('http://localhost:8080/admin/ai/chat', {
+        var resp = await fetch('/api/ai/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'token': this.token },
           body: JSON.stringify({ conversationId: this.currentConvId, message: msg })
         });
 
-        var reader = resp.body.getReader();
-        var decoder = new TextDecoder(); var buffer = '';
-        var self = this;
-
-        function processLines() {
-          return reader.read().then(function(result) {
-            if (result.done) {
-              aiMsg.isStreaming = false;
-              self.isStreaming = false;
-              return;
-            }
-            buffer += decoder.decode(result.value, { stream: true });
-            var lines = buffer.split('\n');
-            buffer = lines.pop() || '';
-
-            for (var i = 0; i < lines.length; i++) {
-              var line = lines[i].trim();
-              if (!line) continue;
-
-              var eventName = '';
-              if (line.startsWith('event:')) {
-                eventName = line.substring(6).trim();
-                continue;
-              }
-              if (!line.startsWith('data:')) continue;
-              var dataStr = line.substring(5).trim();
-              if (!dataStr || dataStr === '[DONE]') continue;
-
-              try {
-                var parsed = JSON.parse(dataStr);
-                if (eventName === 'tool_call' || (parsed.name && parsed.arguments)) {
-                  aiMsg.toolCall = parsed.name || parsed.arguments;
-                } else if (eventName === 'tool_result' || (parsed.name && parsed.data)) {
-                  aiMsg.toolCall = null; aiMsg.toolResult = true;
-                } else if (parsed.conversationId) {
-                  aiMsg.isStreaming = false;
-                  self.currentConvId = parsed.conversationId;
-                  self.currentTitle = parsed.title || self.currentTitle;
-                  self.loadConversations();
-                  self.isStreaming = false;
-                  return;
-                } else if (parsed.message) {
-                  aiMsg.content = '❌ ' + parsed.message;
-                  aiMsg.isStreaming = false;
-                  self.isStreaming = false;
-                  return;
-                }
-              } catch (e) {
-                // raw text chunk
-                if (eventName === 'text' || !eventName) {
-                  aiMsg.content += dataStr;
-                }
-              }
-              self.scrollBottom();
-            }
-            return processLines(); // 递归读取
-          });
+        if (!resp.ok) {
+          this.messages[aiIdx].content = '❌ 请求失败 HTTP ' + resp.status;
+          this.messages[aiIdx].isStreaming = false;
+          this.isStreaming = false;
+          return;
         }
 
-        await processLines();
-        aiMsg.isStreaming = false;
+        var reader = resp.body.getReader();
+        var decoder = new TextDecoder();
+        var leftover = '';
+        var curEvent = '';
+
+        while (true) {
+          var result = await reader.read();
+          if (result.done) break;
+
+          var chunk = leftover + decoder.decode(result.value, { stream: true });
+          var lines = chunk.split('\n');
+          // 最后一行可能不完整，保留到下一次
+          leftover = lines.pop() || '';
+
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (line === '') { curEvent = ''; continue; }
+            if (line.startsWith('event:')) { curEvent = line.substring(6).trim(); continue; }
+            if (!line.startsWith('data:')) continue;
+
+            var data = line.substring(5).trim();
+            if (!data) continue;
+
+            if (curEvent === 'text') {
+              this.messages[aiIdx].content += data;
+            } else if (curEvent === 'tool_call') {
+              this.messages[aiIdx].toolCall = data;
+            } else if (curEvent === 'tool_result') {
+              this.messages[aiIdx].toolCall = null;
+              this.messages[aiIdx].toolResult = true;
+            } else if (curEvent === 'done') {
+              try {
+                var parsed = JSON.parse(data);
+                this.currentConvId = parsed.conversationId;
+                this.currentTitle = parsed.title || this.currentTitle;
+                this.loadConversations();
+              } catch (e2) {}
+              this.messages[aiIdx].isStreaming = false;
+              this.isStreaming = false;
+              this.$nextTick(function() { self.scrollBottom(); });
+              return;
+            } else if (curEvent === 'error') {
+              try {
+                var err = JSON.parse(data);
+                this.messages[aiIdx].content = '❌ ' + (err.message || '未知错误');
+              } catch (e2) {
+                this.messages[aiIdx].content = '❌ 服务异常: ' + data;
+              }
+              this.messages[aiIdx].isStreaming = false;
+              this.isStreaming = false;
+              return;
+            }
+            curEvent = '';
+            this.$nextTick(function() { self.scrollBottom(); });
+          }
+        }
+
+        this.messages[aiIdx].isStreaming = false;
       } catch (e) {
         console.error('Chat error:', e);
-        aiMsg.content = '❌ 连接失败: ' + e.message + ' (请确认后端已启动且 DeepSeek API Key 已配置)';
-        aiMsg.isStreaming = false;
+        this.messages[aiIdx].content = '❌ 连接失败: ' + e.message;
+        this.messages[aiIdx].isStreaming = false;
       }
       this.isStreaming = false;
-      this.scrollBottom();
+      this.$nextTick(function() { self.scrollBottom(); });
     },
     scrollBottom() {
       var self = this;

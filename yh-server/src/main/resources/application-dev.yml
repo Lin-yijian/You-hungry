@@ -22,7 +22,7 @@ sky:
     mchSerialNo: ${SKY_WECHAT_MCH_SERIAL_NO:}
     privateKeyFilePath: ${SKY_WECHAT_PRIVATE_KEY_PATH:}
     apiV3Key: ${SKY_WECHAT_API_V3_KEY:}
-    weChatPayCertFilePath: ${SKY_WECHAT_CERT_PATH:}
+    weChatPayCertFilePath: 1
     notifyUrl: https://37d20616.r8.cpolar.top/notify/paySuccess
     refundNotifyUrl: https://37d20616.r8.cpolar.top/notify/refundSuccess
   ai:
