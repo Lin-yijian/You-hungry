@@ -373,142 +373,67 @@ body {
 <script src=js/chunk-vendors.9b7e46a0.js></script>
 <script src=js/app.d0aa4eb3.js></script>
 
-<!-- ===== AI 助理菜单注入 (DOM级别) + 主题强制覆盖 ===== -->
+<!-- ===== AI 助理菜单注入 + 主题覆盖 ===== -->
 <script>
 (function() {
   'use strict';
+  var ADDED = false;
 
-  var DEBUG = true;
-  var AI_MENU_ADDED = false;
-  var THEME_FIXED = false;
+  function addMenuItem() {
+    if (ADDED) return;
+    var ul = document.querySelector('.sidebar-container .el-menu');
+    if (!ul) return;
+    if (ul.querySelector('.ai-menu')) { ADDED = true; return; }
 
-  function log(msg) { if (DEBUG) console.log('[YouHungry] ' + msg); }
-
-  // 添加 AI 助理菜单项到侧边栏
-  function addAiMenuItem() {
-    if (AI_MENU_ADDED) return;
-
-    // 查找侧边栏中的 el-menu 列表
-    var menuUl = document.querySelector('.sidebar-container .el-menu');
-    if (!menuUl) { log('菜单UL未找到, 重试...'); return; }
-
-    // 检查是否已添加
-    if (menuUl.querySelector('.ai-assistant-menu-item')) { AI_MENU_ADDED = true; return; }
-
-    // 创建新的菜单项
     var li = document.createElement('li');
-    li.className = 'el-menu-item ai-assistant-menu-item';
-    li.setAttribute('role', 'menuitem');
-    li.setAttribute('tabindex', '-1');
-    li.style.cssText = 'padding-left:20px;';
+    li.className = 'el-menu-item ai-menu';
+    li.style.cssText = 'padding-left:20px;cursor:pointer;';
+    li.innerHTML = '<i class="iconfont icon-ai-assistant" style="margin-right:8px;font-style:normal;"></i><span>AI助理</span>';
 
-    // 图标
-    var icon = document.createElement('i');
-    icon.className = 'iconfont icon-ai-assistant';
-    icon.style.cssText = 'margin-right:8px;font-style:normal;';
-    li.appendChild(icon);
-
-    // 文字
-    var span = document.createElement('span');
-    span.textContent = 'AI助理';
-    li.appendChild(span);
-
-    // 点击事件 - 跳转到 AI 助理页面
-    li.addEventListener('click', function() {
-      // 尝试使用 Vue Router
-      var appEl = document.getElementById('app');
-      var vue = appEl && appEl.__vue__;
-      if (vue && vue.$router) {
-        try {
-          // 确保路由存在
-          var router = vue.$router;
-          var routes = router.options.routes;
-          var rootRoute = null;
-          for (var i = 0; i < routes.length; i++) {
-            if (routes[i].path === '/') { rootRoute = routes[i]; break; }
-          }
-          if (rootRoute) {
-            if (!rootRoute.name) rootRoute.name = '__layout__';
-            var hasAi = false;
-            if (rootRoute.children) {
-              for (var j = 0; j < rootRoute.children.length; j++) {
-                if (rootRoute.children[j].path === 'ai-assistant') { hasAi = true; break; }
-              }
-            }
-            if (!hasAi) {
-              router.addRoute('__layout__', {
+    li.onclick = function() {
+      // 尝试 Vue Router，失败则直接跳转
+      try {
+        var v = document.getElementById('app').__vue__;
+        if (v && v.$router) {
+          var root = v.$router.options.routes.find(function(r){ return r.path==='/'; });
+          if (root) {
+            if (!root.name) root.name = '__layout__';
+            if (!root.children || !root.children.find(function(c){ return c.path==='ai-assistant'; })) {
+              v.$router.addRoute('__layout__', {
                 path: 'ai-assistant',
-                component: {
-                  template: '<div style="width:100%;height:100%;">' +
-                    '<iframe src="./ai-assistant.html" frameborder="0" ' +
-                    'style="width:100%;height:calc(100vh - 84px);border:none;"></iframe></div>'
-                },
+                component: { template: '<iframe src="./ai-assistant.html" style="width:100%;height:calc(100vh-84px);border:none;"></iframe>' },
                 meta: { title: 'AI助理', icon: 'icon-ai-assistant' }
               });
             }
+            v.$router.push('/ai-assistant').catch(function(){});
+            return;
           }
-          vue.$router.push('/ai-assistant').catch(function(){});
-        } catch(e) {
-          log('路由跳转失败: ' + e.message);
-          window.location.href = '/ai-assistant.html';
         }
-      } else {
-        window.location.href = '/ai-assistant.html';
-      }
+      } catch(e) {}
+      window.location.href = '/ai-assistant.html';
+    };
 
-      // 高亮当前菜单项
-      var allItems = menuUl.querySelectorAll('.el-menu-item');
-      for (var k = 0; k < allItems.length; k++) {
-        allItems[k].classList.remove('is-active');
-      }
-      li.classList.add('is-active');
-    });
-
-    // 插入到菜单末尾
-    menuUl.appendChild(li);
-    AI_MENU_ADDED = true;
-    log('AI助理菜单项已添加到侧边栏');
+    ul.appendChild(li);
+    ADDED = true;
   }
 
-  // 强制修复主题颜色
-  function fixTheme() {
-    // 修复侧边栏背景
-    var sidebar = document.querySelector('.sidebar-container');
-    if (sidebar) {
-      sidebar.style.setProperty('background', '#1B1F24', 'important');
-    }
-
-    // 修复 el-menu 背景（Vue 设置的内联样式）
+  function fixColors() {
     var menus = document.querySelectorAll('.sidebar-container .el-menu');
-    for (var i = 0; i < menus.length; i++) {
-      var el = menus[i];
-      var bg = window.getComputedStyle(el).backgroundColor || el.style.backgroundColor;
-      if (bg === 'rgb(52, 55, 68)' || el.style.backgroundColor === 'rgb(52, 55, 68)') {
-        el.style.setProperty('background-color', '#1B1F24', 'important');
-        THEME_FIXED = true;
-      }
-      // 也修复内联 style 属性
-      if (el.getAttribute('style') && el.getAttribute('style').indexOf('343744') !== -1) {
-        el.setAttribute('style', el.getAttribute('style').replace(/background-color[^;]+;?/g, ''));
-        el.style.setProperty('background-color', '#1B1F24', 'important');
-        THEME_FIXED = true;
+    for (var i=0; i<menus.length; i++) {
+      var s = menus[i].getAttribute('style') || '';
+      if (s.indexOf('343744')!==-1 || s.indexOf('rgb(52, 55, 68)')!==-1) {
+        menus[i].style.setProperty('background-color', '#1B1F24', 'important');
       }
     }
-    if (THEME_FIXED) log('侧边栏主题已强制覆盖');
   }
 
-  function scan() { fixTheme(); addAiMenuItem(); }
+  // 定时扫描
+  setInterval(function(){ fixColors(); addMenuItem(); }, 800);
 
-  var banner = document.getElementById('__debug_banner');
-  if (banner) { banner.style.display = 'block'; banner.textContent = 'Warm Kitchen v2 - 已激活'; }
-
-  // 持续扫描（Vue 随时可能重建 DOM）
-  setInterval(scan, 500);
-
-  // MutationObserver：DOM 变化时立即重新注入
+  // DOM 变化时重扫
   new MutationObserver(function() {
-    AI_MENU_ADDED = false; THEME_FIXED = false;
-    setTimeout(scan, 50); setTimeout(scan, 200);
+    ADDED = false;
+    setTimeout(function(){ fixColors(); addMenuItem(); }, 100);
   }).observe(document.body, { childList: true, subtree: true });
 })();
 </script>
