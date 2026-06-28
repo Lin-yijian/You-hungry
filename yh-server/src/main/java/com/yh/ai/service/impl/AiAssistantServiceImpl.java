@@ -211,7 +211,7 @@ public class AiAssistantServiceImpl implements AiAssistantService {
                 HttpResponse.BodyHandlers.ofInputStream());
 
         if (response.statusCode() != 200) {
-            String errorBody = new String(response.body().readAllBytes());
+            String errorBody = new String(response.body().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
             log.error("DeepSeek API 错误: status={}, body={}", response.statusCode(), errorBody);
             emitter.send(SseEmitter.event().name("error")
                     .data(JSON.toJSONString(Map.of("message", "AI 服务异常，请稍后重试"))));
@@ -230,7 +230,7 @@ public class AiAssistantServiceImpl implements AiAssistantService {
             String leftover = "";
 
             while ((bytesRead = inputStream.read(buffer)) != -1) {
-                String chunk = leftover + new String(buffer, 0, bytesRead);
+                String chunk = leftover + new String(buffer, 0, bytesRead, java.nio.charset.StandardCharsets.UTF_8);
                 String[] lines = chunk.split("\n");
                 leftover = chunk.endsWith("\n") ? "" : lines[lines.length - 1];
 
