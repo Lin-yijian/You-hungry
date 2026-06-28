@@ -1,10 +1,21 @@
-<!DOCTYPE html><html lang=zh-CN><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel="shortcut icon" href=favicon.ico type=image/x-icon><title>饿了吧外卖</title><link href=css/404.6a750851.css rel=prefetch><link href=css/dashboard.8da8967e.css rel=prefetch><link href=css/login.f8377ced.css rel=prefetch><link href=css/shopTable.5fd29e98.css rel=prefetch><link href=js/404.c61770cf.js rel=prefetch><link href=js/dashboard.630a609e.js rel=prefetch><link href=js/login.90288d75.js rel=prefetch><link href=js/shopTable.fe534d8f.js rel=prefetch><link href=css/app.fd9b670b.css rel=preload as=style><link href=css/chunk-vendors.37cc3fbd.css rel=preload as=style><link href=js/app.d0aa4eb3.js rel=preload as=script><link href=js/chunk-vendors.9b7e46a0.js rel=preload as=script><link href=css/chunk-vendors.37cc3fbd.css rel=stylesheet><link href=css/app.fd9b670b.css rel=stylesheet><link rel=icon type=image/png sizes=32x32 href=img/icons/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=img/icons/favicon-16x16.png><link rel=manifest href=manifest.json><meta name=theme-color content=#DA291C><meta name=apple-mobile-web-app-capable content=no><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><meta name=apple-mobile-web-app-title content="饿了吧外卖"><link rel=apple-touch-icon href=img/icons/apple-touch-icon-152x152.png><link rel=mask-icon href=img/icons/safari-pinned-tab.svg color=#DA291C><meta name=msapplication-TileImage content=img/icons/msapplication-icon-144x144.png><meta name=msapplication-TileColor content=#DA291C>
+<!DOCTYPE html><html lang=zh-CN><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=Cache-Control content="no-cache, no-store, must-revalidate"><meta http-equiv=Pragma content=no-cache><meta http-equiv=Expires content=0>
+
+<!-- ===== Service Worker 注销（开发阶段禁用缓存） ===== -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    for (var i = 0; i < regs.length; i++) {
+      regs[i].unregister();
+      console.log('[SW] Service Worker 已注销:', regs[i].scope);
+    }
+  });
+}
+</script><link rel="shortcut icon" href=favicon.ico type=image/x-icon><title>饿了吧外卖</title><link href=css/404.6a750851.css rel=prefetch><link href=css/dashboard.8da8967e.css rel=prefetch><link href=css/login.f8377ced.css rel=prefetch><link href=css/shopTable.5fd29e98.css rel=prefetch><link href=js/404.c61770cf.js rel=prefetch><link href=js/dashboard.630a609e.js rel=prefetch><link href=js/login.90288d75.js rel=prefetch><link href=js/shopTable.fe534d8f.js rel=prefetch><link href=css/app.fd9b670b.css rel=preload as=style><link href=css/chunk-vendors.37cc3fbd.css rel=preload as=style><link href=js/app.d0aa4eb3.js rel=preload as=script><link href=js/chunk-vendors.9b7e46a0.js rel=preload as=script><link href=css/chunk-vendors.37cc3fbd.css rel=stylesheet><link href=css/app.fd9b670b.css rel=stylesheet><link rel=icon type=image/png sizes=32x32 href=img/icons/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=img/icons/favicon-16x16.png><link rel=manifest href=manifest.json><meta name=theme-color content=#E85D3A><meta name=apple-mobile-web-app-capable content=no><meta name=apple-mobile-web-app-status-bar-style content=black-translucent><meta name=apple-mobile-web-app-title content="饿了吧外卖"><link rel=apple-touch-icon href=img/icons/apple-touch-icon-152x152.png><link rel=mask-icon href=img/icons/safari-pinned-tab.svg color=#E85D3A><meta name=msapplication-TileImage content=img/icons/msapplication-icon-144x144.png><meta name=msapplication-TileColor content=#E85D3A>
 
 <!-- ===== 品牌文本修复脚本 ===== -->
 <script>
 (function(){
   'use strict';
-  // 1. 预设 localStorage 中的 user_info（防止未登录时的旧名称）
   try {
     var raw = localStorage.getItem('user_info');
     if (raw) {
@@ -16,7 +27,6 @@
     }
   } catch(e) {}
 
-  // 2. 拦截 localStorage.setItem，自动替换苍穹相关名称
   var _setItem = Storage.prototype.setItem;
   Storage.prototype.setItem = function(key, value) {
     if ((key === 'user_info' || key === 'userInfo') && value && value.indexOf('苍穹') !== -1) {
@@ -30,9 +40,8 @@
     return _setItem.call(this, key, value);
   };
 
-  // 3. MutationObserver 兜底：捕获页面上任何"苍穹外卖"文字并替换
   function replaceText(node) {
-    if (node.nodeType === 3) { // Text node
+    if (node.nodeType === 3) {
       if (node.textContent.indexOf('苍穹') !== -1) {
         node.textContent = node.textContent.replace(/苍穹外卖/g, '饿了吧外卖');
       }
@@ -42,15 +51,13 @@
       }
     }
   }
-  // 首次替换
+
   document.addEventListener('DOMContentLoaded', function() {
     var app = document.getElementById('app');
     if (app) {
       var observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(m) {
-          m.addedNodes.forEach(function(node) {
-            replaceText(node);
-          });
+          m.addedNodes.forEach(function(node) { replaceText(node); });
         });
       });
       observer.observe(app, { childList: true, subtree: true, characterData: true });
@@ -61,205 +68,183 @@
 </script>
 
 <style>
-/* ===== 全局 ===== */
+/* ===== Warm Kitchen 色系 ===== */
 :root {
-  --red: #DA291C; --gold: #FFC72C; --gold-light: #FFE082;
-  --bg-dark: #1a1a1a; --bg-darker: #141414; --bg-card: #1e1e1e;
-  --text-primary: #e8e8e8; --text-secondary: #9e9e9e;
+  --primary: #E85D3A; --primary-dark: #C4452A; --primary-light: #F08060;
+  --accent: #F0A500; --accent-light: #FFC940;
+  --sidebar-bg: #1B1F24; --sidebar-hover: #262A30;
+  --page-bg: #F2F0EC; --card-bg: #FFFFFF;
+  --text-primary: #2D3436; --text-secondary: #636E72;
+  --text-light: rgba(255,255,255,0.7); --border: #E8E3DD;
+  --success: #27AE60; --warning: #F39C12;
 }
 body {
   font-family: 'Microsoft YaHei', 'PingFang SC', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #f0f2f5;
+  background: var(--page-bg);
 }
 
 /* ===== 登录页 ===== */
 .login {
-  background: linear-gradient(135deg, #0d0d0d 0%, #1a0505 45%, #0d0d0d 100%) !important;
+  background: linear-gradient(135deg, #1a1513 0%, #2d1f18 45%, #1a1513 100%) !important;
   display: flex; align-items: center; justify-content: center;
 }
 .login-box {
   width: 960px !important; height: 520px !important;
   border-radius: 20px !important; overflow: hidden !important;
-  box-shadow: 0 30px 80px rgba(0,0,0,.6) !important;
-  display: flex !important; background: #1e1e1e !important;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5) !important;
+  display: flex !important; background: #fff !important;
 }
 .login-box > img {
   width: 55% !important; height: 100% !important;
   object-fit: cover !important; flex-shrink: 0 !important;
 }
 .login-form {
-  background: #1e1e1e !important; width: 45% !important;
+  background: #fff !important; width: 45% !important;
   border-radius: 0 !important; padding: 48px 40px !important;
   display: flex !important; flex-direction: column !important;
   justify-content: center !important; box-sizing: border-box !important;
 }
-.login-form .el-form {
-  width: 100% !important; height: auto !important;
-}
+.login-form .el-form { width: 100% !important; height: auto !important; }
 .login-form-title {
-  height: auto !important; margin-bottom: 40px !important;
+  height: auto !important; margin-bottom: 36px !important;
   display: flex !important; justify-content: center !important;
   align-items: center !important;
 }
 .login-form-title img {
   width: auto !important; height: 44px !important;
-  filter: drop-shadow(0 2px 6px rgba(255,199,44,.25));
+  filter: drop-shadow(0 2px 6px rgba(240,165,0,.2));
 }
-.login-form .el-form-item {
-  margin-bottom: 24px !important;
-}
+.login-form .el-form-item { margin-bottom: 24px !important; }
 .login-form .el-input__inner {
-  background: rgba(255,255,255,.04) !important;
-  border: 0 !important; border-bottom: 2px solid rgba(255,255,255,.1) !important;
-  border-radius: 0 !important; font-size: 14px !important;
-  color: #e8e8e8 !important; height: 44px !important;
-  line-height: 44px !important; padding-left: 30px !important;
+  background: #f8f6f3 !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 8px !important; font-size: 14px !important;
+  color: var(--text-primary) !important; height: 46px !important;
+  line-height: 46px !important; padding-left: 36px !important;
   transition: border-color .3s !important;
 }
-.login-form .el-input__inner:focus {
-  border-bottom-color: #FFC72C !important;
-}
-.login-form .el-input__inner::placeholder {
-  color: rgba(255,255,255,.25) !important;
-}
+.login-form .el-input__inner:focus { border-color: var(--primary) !important; }
+.login-form .el-input__inner::placeholder { color: #b0aaa5 !important; }
 .login-form .el-input__prefix {
-  left: 2px !important; color: rgba(255,255,255,.3) !important; line-height: 44px !important;
+  left: 4px !important; color: #b0aaa5 !important; line-height: 46px !important;
 }
 .login-btn {
   width: 100% !important; height: 46px !important;
   border-radius: 23px !important; font-size: 16px !important;
   font-weight: 700 !important; letter-spacing: 4px !important;
-  color: #1a1a1a !important; border: 0 !important;
-  background: linear-gradient(135deg, #FFE082, #FFC72C, #FFB300) !important;
-  box-shadow: 0 4px 24px rgba(255,199,44,.35) !important;
+  color: #fff !important; border: 0 !important;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary), var(--primary-dark)) !important;
+  box-shadow: 0 4px 20px rgba(232,93,58,.35) !important;
   transition: all .3s !important; cursor: pointer !important;
 }
 .login-btn:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 32px rgba(255,199,44,.5) !important;
+  box-shadow: 0 8px 28px rgba(232,93,58,.5) !important;
 }
 
 /* ===== 导航栏 ===== */
 .navbar {
-  background: #1a1a1a !important; height: 60px !important;
-  border-bottom: 1px solid rgba(255,255,255,.06) !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,.25) !important;
+  background: #fff !important; height: 60px !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 1px 8px rgba(0,0,0,.06) !important;
   padding: 0 20px !important; display: flex !important;
   align-items: center !important; box-sizing: border-box;
 }
-.navbar .hamburger-container {
-  line-height: 60px !important; padding: 0 6px;
-}
-.navbar .breadcrumb-container {
-  line-height: 60px !important; margin-left: 12px;
-}
+.navbar .hamburger-container { line-height: 60px !important; padding: 0 6px; }
+.navbar .breadcrumb-container { line-height: 60px !important; margin-left: 12px; }
 .navbar .el-breadcrumb__inner {
-  color: rgba(255,255,255,.65) !important; font-weight: 400 !important;
+  color: var(--text-secondary) !important; font-weight: 400 !important;
 }
 .navbar .el-breadcrumb__item:last-child .el-breadcrumb__inner {
-  color: #FFC72C !important;
+  color: var(--primary) !important; font-weight: 600 !important;
 }
 .navbar .right-menu {
   height: 60px !important; line-height: 60px !important;
   display: flex !important; align-items: center !important;
 }
-/* 营业状态设置按钮 */
-.navbar .right-menu .el-dropdown {
-  color: #e8e8e8 !important; cursor: pointer;
-}
+.navbar .right-menu .el-dropdown { color: var(--text-primary) !important; cursor: pointer; }
 .navbar .right-menu .el-dropdown .el-dropdown-link {
-  color: #e8e8e8 !important; font-size: 13px;
+  color: var(--text-primary) !important; font-size: 13px;
   padding: 6px 14px; border-radius: 6px;
-  background: rgba(218,41,28,.15);
-  border: 1px solid rgba(218,41,28,.3);
+  background: rgba(232,93,58,.08);
+  border: 1px solid rgba(232,93,58,.2);
   transition: all .25s;
 }
 .navbar .right-menu .el-dropdown .el-dropdown-link:hover {
-  background: rgba(218,41,28,.25); color: #fff !important;
+  background: rgba(232,93,58,.15); color: var(--primary) !important;
 }
-/* 导航栏用户区 */
 .navbar .right-menu .el-dropdown .el-dropdown-link.user {
-  background: transparent !important; border: 0 !important;
-  padding: 0 8px;
+  background: transparent !important; border: 0 !important; padding: 0 8px;
 }
-.navbar .avatar-wrapper {
-  display: flex; align-items: center; gap: 6px;
-}
-.navbar .avatar-wrapper .user-name {
-  color: #e8e8e8; font-size: 13px;
-}
+.navbar .avatar-wrapper { display: flex; align-items: center; gap: 6px; }
+.navbar .avatar-wrapper .user-name { color: var(--text-primary); font-size: 13px; }
 
 /* ===== 侧边栏 ===== */
 .sidebar-container {
-  background: linear-gradient(180deg, #1a1a1a 0%, #111 100%) !important;
+  background: var(--sidebar-bg) !important;
   border-right: 1px solid rgba(255,255,255,.04);
 }
-/* 展开时的 logo 区 */
+/* 强制覆盖编译 CSS 中的旧色值 */
+.sidebar-container .el-menu,
+.sidebar-container .scrollbar-wrapper,
+.sidebar-container .el-scrollbar__view {
+  background-color: #1B1F24 !important;
+}
+.sidebar-container .el-menu-item,
+.sidebar-container .el-submenu__title {
+  background-color: transparent !important;
+}
 .sidebar-logo {
-  background: linear-gradient(180deg, rgba(218,41,28,.12) 0%, transparent 100%) !important;
+  background: linear-gradient(180deg, rgba(232,93,58,.1) 0%, transparent 100%) !important;
   border-bottom: 1px solid rgba(255,255,255,.06) !important;
   padding: 18px 20px !important; height: auto !important;
   display: flex !important; align-items: center !important; box-sizing: border-box;
 }
 .sidebar-logo img {
   height: 32px !important; width: auto !important;
-  filter: drop-shadow(0 2px 4px rgba(255,199,44,.2));
+  filter: drop-shadow(0 2px 4px rgba(240,165,0,.15));
 }
-/* 收起时的 mini logo 区 */
 .sidebar-logo-mini {
   padding: 16px 0 !important; text-align: center !important;
   display: flex; justify-content: center; align-items: center;
 }
 .sidebar-logo-mini img {
   width: 36px !important; height: 36px !important;
-  filter: drop-shadow(0 2px 4px rgba(255,199,44,.2));
+  filter: drop-shadow(0 2px 4px rgba(240,165,0,.15));
 }
-/* 菜单 */
-.el-menu {
-  background: transparent !important; border-right: 0 !important;
-}
+.el-menu { background: transparent !important; border-right: 0 !important; }
 .el-menu-item {
   height: 48px !important; line-height: 48px !important;
-  font-size: 14px !important; color: rgba(255,255,255,.5) !important;
+  font-size: 14px !important; color: var(--text-light) !important;
   margin: 3px 10px !important; border-radius: 8px !important;
   transition: all .25s !important;
 }
-.el-menu-item i, .el-menu-item svg {
-  color: rgba(255,255,255,.35) !important;
-}
+.el-menu-item i, .el-menu-item svg { color: rgba(255,255,255,.35) !important; }
 .el-menu-item:hover {
-  background: rgba(255,199,44,.08) !important;
-  color: #e8e8e8 !important;
+  background: var(--sidebar-hover) !important; color: #fff !important;
 }
-.el-menu-item:hover i, .el-menu-item:hover svg {
-  color: rgba(255,199,44,.8) !important;
-}
+.el-menu-item:hover i, .el-menu-item:hover svg { color: var(--accent-light) !important; }
 .el-menu-item.is-active {
-  background: linear-gradient(135deg, rgba(218,41,28,.25), rgba(218,41,28,.08)) !important;
-  color: #FFC72C !important; font-weight: 600 !important;
+  background: linear-gradient(135deg, rgba(232,93,58,.25), rgba(232,93,58,.08)) !important;
+  color: var(--accent-light) !important; font-weight: 600 !important;
 }
-.el-menu-item.is-active i, .el-menu-item.is-active svg {
-  color: #FFC72C !important;
-}
+.el-menu-item.is-active i, .el-menu-item.is-active svg { color: var(--accent) !important; }
 .el-submenu__title {
   height: 48px !important; line-height: 48px !important;
-  font-size: 14px !important; color: rgba(255,255,255,.5) !important;
+  font-size: 14px !important; color: var(--text-light) !important;
   margin: 3px 10px !important; border-radius: 8px !important;
   transition: all .25s !important;
 }
-.el-submenu__title i, .el-submenu__title svg {
-  color: rgba(255,255,255,.35) !important;
-}
+.el-submenu__title i, .el-submenu__title svg { color: rgba(255,255,255,.35) !important; }
 .el-submenu__title:hover {
-  background: rgba(255,199,44,.08) !important;
-  color: #e8e8e8 !important;
+  background: var(--sidebar-hover) !important; color: #fff !important;
 }
 .el-submenu .el-menu { margin-left: 8px !important; }
 
 /* ===== 主内容区 ===== */
 .app-main {
-  background: #f0f2f5 !important;
+  background: var(--page-bg) !important;
   min-height: calc(100vh - 60px) !important;
   padding: 16px;
 }
@@ -270,51 +255,43 @@ body {
 
 /* ===== 表格 ===== */
 .el-table th.el-table__cell {
-  background: #fafafa !important; color: #333 !important;
+  background: #faf8f5 !important; color: var(--text-primary) !important;
   font-weight: 600 !important; font-size: 13px !important;
-  border-bottom: 2px solid rgba(255,199,44,.4) !important;
+  border-bottom: 2px solid rgba(240,165,0,.3) !important;
 }
 
 /* ===== 按钮 ===== */
 .el-button--primary {
-  background: linear-gradient(135deg, #DA291C, #b71c1c) !important;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
   border: 0 !important; font-weight: 600 !important;
   border-radius: 6px !important;
-  box-shadow: 0 2px 10px rgba(218,41,28,.25) !important;
+  box-shadow: 0 2px 10px rgba(232,93,58,.25) !important;
   transition: all .25s !important;
 }
 .el-button--primary:hover {
-  box-shadow: 0 6px 20px rgba(218,41,28,.4) !important;
+  box-shadow: 0 6px 20px rgba(232,93,58,.4) !important;
   transform: translateY(-1px) !important;
 }
 
 /* ===== 弹窗 ===== */
-.el-dialog {
-  border-radius: 12px !important; overflow: hidden;
-}
+.el-dialog { border-radius: 12px !important; overflow: hidden; }
 .el-dialog__header {
-  background: #1a1a1a !important;
-  border-radius: 12px 12px 0 0 !important; border: 0 !important;
+  background: #fff !important;
+  border-radius: 12px 12px 0 0 !important; border-bottom: 1px solid var(--border) !important;
   padding: 18px 24px !important;
 }
-.el-dialog__title {
-  color: #FFC72C !important; font-weight: 600 !important; font-size: 16px;
-}
-.el-dialog__headerbtn .el-dialog__close {
-  color: rgba(255,255,255,.5) !important;
-}
-.el-dialog__body {
-  padding: 24px !important; color: #333;
-}
+.el-dialog__title { color: var(--text-primary) !important; font-weight: 600 !important; font-size: 16px; }
+.el-dialog__headerbtn .el-dialog__close { color: var(--text-secondary) !important; }
+.el-dialog__body { padding: 24px !important; color: var(--text-primary); }
 
 /* ===== 分页 ===== */
 .el-pagination.is-background .el-pager li:not(.disabled).active {
-  background: #DA291C !important; color: #fff !important;
+  background: var(--primary) !important; color: #fff !important;
 }
 
-/* ===== 汉堡菜单图标 ===== */
-.hamburger { color: rgba(255,255,255,.6) !important; }
-.hamburger:hover { color: #FFC72C !important; }
+/* ===== 汉堡菜单 ===== */
+.hamburger { color: var(--text-secondary) !important; }
+.hamburger:hover { color: var(--primary) !important; }
 
 /* ===== 滚动条 ===== */
 ::-webkit-scrollbar { width: 6px; }
@@ -325,28 +302,229 @@ body {
 /* ===== 面包屑 ===== */
 .el-breadcrumb { font-size: 13px; }
 
-/* ===== 输入框全局增强 ===== */
-.el-input__inner:focus { border-color: #FFC72C !important; }
-.el-select .el-input.is-focus .el-input__inner { border-color: #FFC72C !important; }
+/* ===== 输入框全局 ===== */
+.el-input__inner:focus { border-color: var(--primary) !important; }
+.el-select .el-input.is-focus .el-input__inner { border-color: var(--primary) !important; }
 
 /* ===== 下拉菜单 ===== */
 .el-dropdown-menu__item:focus,
 .el-dropdown-menu__item:not(.is-disabled):hover {
-  background-color: rgba(255,199,44,.1) !important; color: #DA291C !important;
+  background-color: rgba(232,93,58,.08) !important; color: var(--primary) !important;
 }
-.el-select-dropdown__item.selected {
-  color: #DA291C !important; font-weight: 600;
-}
+.el-select-dropdown__item.selected { color: var(--primary) !important; font-weight: 600; }
 
 /* ===== 标签页 ===== */
-.el-tabs__active-bar { background-color: #DA291C !important; }
-.el-tabs__item.is-active { color: #DA291C !important; }
-.el-tabs__item:hover { color: #DA291C !important; }
+.el-tabs__active-bar { background-color: var(--primary) !important; }
+.el-tabs__item.is-active { color: var(--primary) !important; }
+.el-tabs__item:hover { color: var(--primary) !important; }
+
+/* ===== AI 助理菜单图标 ===== */
+.iconfont.icon-ai-assistant::before {
+  content: "🤖"; font-style: normal;
+}
+
+/* ===== 强制覆盖编译 CSS 中的旧色值 ===== */
+.el-menu--vertical {
+  background-color: #1B1F24 !important;
+}
 </style>
+
+<!-- ===== DOM级别主题强制覆盖 ===== -->
+<script>
+(function() {
+  // MutationObserver 强制覆盖 Vue 设置的内联样式
+  function forceTheme() {
+    var menus = document.querySelectorAll('.el-menu');
+    for (var i = 0; i < menus.length; i++) {
+      var m = menus[i];
+      if (m.style.backgroundColor && m.style.backgroundColor !== 'rgb(27, 31, 36)') {
+        m.style.setProperty('background-color', '#1B1F24', 'important');
+      }
+    }
+    var sidebars = document.querySelectorAll('.sidebar-container');
+    for (var j = 0; j < sidebars.length; j++) {
+      sidebars[j].style.setProperty('background', '#1B1F24', 'important');
+    }
+  }
+
+  var observer = new MutationObserver(function() {
+    forceTheme();
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var app = document.getElementById('app');
+    if (app) {
+      observer.observe(app, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+      // 多次执行确保生效
+      setTimeout(forceTheme, 100);
+      setTimeout(forceTheme, 500);
+      setTimeout(forceTheme, 1500);
+      setTimeout(forceTheme, 3000);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 <noscript><strong>We're sorry but doesn't work properly without JavaScript enabled. Please enable it to continue.</strong></noscript>
 <div id=app></div>
+<!-- 调试标记：如果看到这个红条，说明新HTML已加载 -->
+<div id="__debug_banner" style="position:fixed;top:0;left:0;z-index:99999;background:#E85D3A;color:#fff;padding:2px 12px;font-size:11px;border-radius:0 0 6px 0;display:none;">Warm Kitchen v2 - 新版本已加载</div>
 <script src=js/chunk-vendors.9b7e46a0.js></script>
 <script src=js/app.d0aa4eb3.js></script>
+
+<!-- ===== AI 助理菜单注入 (DOM级别) + 主题强制覆盖 ===== -->
+<script>
+(function() {
+  'use strict';
+
+  var DEBUG = true;
+  var AI_MENU_ADDED = false;
+  var THEME_FIXED = false;
+
+  function log(msg) { if (DEBUG) console.log('[YouHungry] ' + msg); }
+
+  // 添加 AI 助理菜单项到侧边栏
+  function addAiMenuItem() {
+    if (AI_MENU_ADDED) return;
+
+    // 查找侧边栏中的 el-menu 列表
+    var menuUl = document.querySelector('.sidebar-container .el-menu');
+    if (!menuUl) { log('菜单UL未找到, 重试...'); return; }
+
+    // 检查是否已添加
+    if (menuUl.querySelector('.ai-assistant-menu-item')) { AI_MENU_ADDED = true; return; }
+
+    // 创建新的菜单项
+    var li = document.createElement('li');
+    li.className = 'el-menu-item ai-assistant-menu-item';
+    li.setAttribute('role', 'menuitem');
+    li.setAttribute('tabindex', '-1');
+    li.style.cssText = 'padding-left:20px;';
+
+    // 图标
+    var icon = document.createElement('i');
+    icon.className = 'iconfont icon-ai-assistant';
+    icon.style.cssText = 'margin-right:8px;font-style:normal;';
+    li.appendChild(icon);
+
+    // 文字
+    var span = document.createElement('span');
+    span.textContent = 'AI助理';
+    li.appendChild(span);
+
+    // 点击事件 - 跳转到 AI 助理页面
+    li.addEventListener('click', function() {
+      // 尝试使用 Vue Router
+      var appEl = document.getElementById('app');
+      var vue = appEl && appEl.__vue__;
+      if (vue && vue.$router) {
+        try {
+          // 确保路由存在
+          var router = vue.$router;
+          var routes = router.options.routes;
+          var rootRoute = null;
+          for (var i = 0; i < routes.length; i++) {
+            if (routes[i].path === '/') { rootRoute = routes[i]; break; }
+          }
+          if (rootRoute) {
+            if (!rootRoute.name) rootRoute.name = '__layout__';
+            var hasAi = false;
+            if (rootRoute.children) {
+              for (var j = 0; j < rootRoute.children.length; j++) {
+                if (rootRoute.children[j].path === 'ai-assistant') { hasAi = true; break; }
+              }
+            }
+            if (!hasAi) {
+              router.addRoute('__layout__', {
+                path: 'ai-assistant',
+                component: {
+                  template: '<div style="width:100%;height:100%;">' +
+                    '<iframe src="./ai-assistant.html" frameborder="0" ' +
+                    'style="width:100%;height:calc(100vh - 84px);border:none;"></iframe></div>'
+                },
+                meta: { title: 'AI助理', icon: 'icon-ai-assistant' }
+              });
+            }
+          }
+          vue.$router.push('/ai-assistant').catch(function(){});
+        } catch(e) {
+          log('路由跳转失败: ' + e.message);
+          window.location.href = '/ai-assistant.html';
+        }
+      } else {
+        window.location.href = '/ai-assistant.html';
+      }
+
+      // 高亮当前菜单项
+      var allItems = menuUl.querySelectorAll('.el-menu-item');
+      for (var k = 0; k < allItems.length; k++) {
+        allItems[k].classList.remove('is-active');
+      }
+      li.classList.add('is-active');
+    });
+
+    // 插入到菜单末尾
+    menuUl.appendChild(li);
+    AI_MENU_ADDED = true;
+    log('AI助理菜单项已添加到侧边栏');
+  }
+
+  // 强制修复主题颜色
+  function fixTheme() {
+    // 修复侧边栏背景
+    var sidebar = document.querySelector('.sidebar-container');
+    if (sidebar) {
+      sidebar.style.setProperty('background', '#1B1F24', 'important');
+    }
+
+    // 修复 el-menu 背景（Vue 设置的内联样式）
+    var menus = document.querySelectorAll('.sidebar-container .el-menu');
+    for (var i = 0; i < menus.length; i++) {
+      var el = menus[i];
+      var bg = window.getComputedStyle(el).backgroundColor || el.style.backgroundColor;
+      if (bg === 'rgb(52, 55, 68)' || el.style.backgroundColor === 'rgb(52, 55, 68)') {
+        el.style.setProperty('background-color', '#1B1F24', 'important');
+        THEME_FIXED = true;
+      }
+      // 也修复内联 style 属性
+      if (el.getAttribute('style') && el.getAttribute('style').indexOf('343744') !== -1) {
+        el.setAttribute('style', el.getAttribute('style').replace(/background-color[^;]+;?/g, ''));
+        el.style.setProperty('background-color', '#1B1F24', 'important');
+        THEME_FIXED = true;
+      }
+    }
+    if (THEME_FIXED) log('侧边栏主题已强制覆盖');
+  }
+
+  function scan() { fixTheme(); addAiMenuItem(); }
+
+  var banner = document.getElementById('__debug_banner');
+  if (banner) { banner.style.display = 'block'; banner.textContent = 'Warm Kitchen v2 - 已激活'; }
+
+  // 持续扫描（Vue 随时可能重建 DOM）
+  setInterval(scan, 500);
+
+  // MutationObserver：DOM 变化时立即重新注入
+  new MutationObserver(function() {
+    AI_MENU_ADDED = false; THEME_FIXED = false;
+    setTimeout(scan, 50); setTimeout(scan, 200);
+  }).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 </body></html>
+
+<!-- ===== 再次确保 SW 被注销 ===== -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    for (var i = 0; i < regs.length; i++) {
+      regs[i].unregister();
+    }
+  });
+  // 阻止后续注册
+  navigator.serviceWorker.register = function() {
+    return Promise.reject(new Error('Service Worker disabled for development'));
+  };
+}
+</script>
